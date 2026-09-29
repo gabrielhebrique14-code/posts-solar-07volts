@@ -208,7 +208,15 @@ document.addEventListener('keydown',e=>{ if(lb.hidden) return; if(e.key==='Escap
 
 // ===== aprovação (Firebase opcional; sem configuração, salva só neste navegador) =====
 const ADMIN_EMAIL = "gabrielhebrique14@gmail.com";
-const FIREBASE_CONFIG = null; // cole aqui o objeto firebaseConfig do seu projeto (veja LEIA-ME)
+cconst FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDPCp9_3PSBvIxa5b11Gk_q1a-W-GnyRQw",
+  authDomain: "solar-e-07volts.firebaseapp.com",
+  projectId: "solar-e-07volts",
+  storageBucket: "solar-e-07volts.firebasestorage.app",
+  messagingSenderId: "283474972593",
+  appId: "1:283474972593:web:bc9d39c2d4fb566635b790",
+  measurementId: "G-RQHD8ZRSPT"
+}; // cole aqui o objeto firebaseConfig do seu projeto (veja LEIA-ME)
 const REV = {}, MINE = {};
 let store=null, isAdmin=false, adminFilter='all', who=''; 
 try{ MINE_LS=JSON.parse(localStorage.getItem('mine')||'{}'); Object.assign(MINE,MINE_LS); who=localStorage.getItem('who')||''; }catch(e){}
