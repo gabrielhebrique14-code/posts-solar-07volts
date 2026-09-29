@@ -103,7 +103,7 @@ table.adm td a{color:var(--fg);font-weight:600}
   <header class="top">
     <div>
       <div class="brandrow"><span class="lg"><img src="solar_logo.png" alt="Solar Para Todos"></span><span class="lg"><img src="07v_logo.png" alt="07 Volts"></span></div>
-      <h1>Posts Solar Para Todos e 07 Volts</h1>
+      <h1 title="versão 3 com Firebase">Posts Solar Para Todos e 07 Volts</h1>
       <p class="sub">Artes e legendas dos perfis Solar Para Todos e 07 Volts, sem datas fixas. Clique numa arte para ver em tamanho real e use “Copiar legenda” na hora de postar.</p>
     </div>
     <div class="stats" id="stats"></div>
@@ -241,12 +241,12 @@ async function save(i,status,comment){
   const p=POSTS[i], st=document.getElementById('st-'+i);
   const rec={num:p.num,title:p.title,profile:p.profile,status,comment:comment||'',by:who||'Revisor',at:new Date().toISOString()};
   try{
-    if(store) await store.save(rec);
+    if(FIREBASE_CONFIG){ if(!store) throw new Error('sem banco'); await store.save(rec); }
     MINE[p.num]=rec; REV[p.num]=rec;
     try{ localStorage.setItem('mine',JSON.stringify(MINE)); }catch(e){}
     document.getElementById('rv-'+i).dataset.edit='0'; renderRv(i); renderAdmin();
     st.textContent = status==='approved'?'Post aprovado.':'Reprovação enviada.';
-  }catch(e){ st.textContent='Não foi possível salvar. Verifique a conexão e a configuração do Firebase.'; }
+  }catch(e){ st.textContent='Voto NÃO salvo. Recarregue a página e confira se o login anônimo está ativo no Firebase.'; }
 }
 list.addEventListener('click',e=>{
   const g=k=>{const b=e.target.closest('['+k+']'); return b?+b.getAttribute(k):null;};
@@ -281,20 +281,33 @@ if(!FIREBASE_CONFIG){
   if(location.hash==='#admin' || new URLSearchParams(location.search).has('admin')){ isAdmin=true; Object.assign(REV,MINE); renderAdmin(); }
   adm.innerHTML='<span class="note">Modo de teste: as aprovações ficam só neste navegador. Configure o Firebase para reunir tudo no painel.</span>';
 }else{
+  adm.innerHTML='<span class="note">Conectando ao banco de dados...</span>';
+  const say=(m,err)=>{ adm.innerHTML='<span class="note" style="'+(err?'color:var(--no);':'')+'">'+m+'</span>'; };
   (async()=>{
     const V='10.14.1', B='https://www.gstatic.com/firebasejs/'+V+'/';
     const [{initializeApp},A,F]=await Promise.all([import(B+'firebase-app.js'),import(B+'firebase-auth.js'),import(B+'firebase-firestore.js')]);
     const app=initializeApp(FIREBASE_CONFIG), auth=A.getAuth(app), fs=F.getFirestore(app);
-    store={ save: rec=>F.setDoc(F.doc(fs,'reviews',rec.num),rec) };
-    let watching=false;
-    function watch(){ if(watching) return; watching=true; F.onSnapshot(F.collection(fs,'reviews'),s=>{ s.forEach(d=>{ REV[d.id]=d.data(); }); renderAdmin(); },()=>{}); }
-    A.onAuthStateChanged(auth,u=>{
-      if(!u){ A.signInAnonymously(auth).catch(()=>{}); return; }
-      if(!u.isAnonymous && u.email===ADMIN_EMAIL){ isAdmin=true; watch(); renderAdmin(); adm.innerHTML='<button class="btn" id="out">Sair do modo administrador</button>'; document.getElementById('out').onclick=()=>A.signOut(auth); }
-      else if(!u.isAnonymous){ A.signOut(auth); }
-      else { adm.innerHTML='<button class="btn" id="in">Entrar como administrador</button>'; document.getElementById('in').onclick=()=>A.signInWithPopup(auth,new A.GoogleAuthProvider()).catch(()=>{}); }
+    let ready=false, watching=false;
+    store={ save: async rec=>{ if(!auth.currentUser) throw new Error('sem login'); await F.setDoc(F.doc(fs,'reviews',rec.num),rec); } };
+    function loginBtn(){
+      adm.innerHTML='<button class="btn primary" id="in">Entrar como administrador</button> <span class="note" id="msg"></span>';
+      document.getElementById('in').onclick=async()=>{
+        const m=document.getElementById('msg'); m.textContent='';
+        try{ await A.signInWithPopup(auth,new A.GoogleAuthProvider()); }
+        catch(e){ m.style.color='var(--no)'; m.textContent = e.code==='auth/unauthorized-domain' ? 'Domínio não autorizado no Firebase (adicione gabrielhebrique14-code.github.io em Authentication > Configurações > Domínios autorizados).' : e.code==='auth/operation-not-allowed' ? 'Ative o login Google em Authentication > Método de login.' : e.code==='auth/popup-blocked' ? 'O navegador bloqueou a janela. Libere pop-ups para este site.' : 'Erro: '+(e.code||e.message); }
+      };
+    }
+    function watch(){ if(watching) return; watching=true; F.onSnapshot(F.collection(fs,'reviews'),s=>{ s.forEach(d=>{ REV[d.id]=d.data(); }); renderAdmin(); },e=>{ say('Sem permissão para ler as aprovações. Publique as regras do Firestore (LEIA-ME).',true); }); }
+    A.onAuthStateChanged(auth,async u=>{
+      if(u && !u.isAnonymous){
+        if(u.email===ADMIN_EMAIL){ isAdmin=true; watch(); renderAdmin(); adm.innerHTML='<span class="note">Administrador: '+u.email+'</span> <button class="btn" id="out">Sair</button>'; document.getElementById('out').onclick=()=>A.signOut(auth); }
+        else { await A.signOut(auth); loginBtn(); document.getElementById('msg').textContent='Esse e-mail não é o administrador.'; }
+        return;
+      }
+      isAdmin=false; renderAdmin(); loginBtn();
+      if(!u){ try{ await A.signInAnonymously(auth); }catch(e){ const m=document.getElementById('msg'); if(m){ m.style.color='var(--no)'; m.textContent = e.code==='auth/operation-not-allowed' ? 'Ative o login Anônimo em Authentication > Método de login para os revisores votarem.' : 'Erro no login anônimo: '+(e.code||e.message); } } }
     });
-  })().catch(()=>{ adm.innerHTML='<span class="note">Não foi possível conectar ao banco de dados.</span>'; });
+  })().catch(e=>{ say('Não foi possível conectar ao Firebase: '+(e.code||e.message||e),true); });
 }
 </script>
 
