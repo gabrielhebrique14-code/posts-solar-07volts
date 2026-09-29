@@ -1,10 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="robots" content="noindex,nofollow">
-<link rel="icon" href="07v_logo.png">
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><link rel="icon" href="07v_logo.png">
 <title>Posts Solar Para Todos e 07 Volts</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Outfit:wght@400;500;600&display=swap">
@@ -74,10 +69,36 @@ h2{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:-.02
 .lb .cnt{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom,0px));color:#fff;font:600 14px var(--body)}
 @media (max-width:860px){.post{grid-template-columns:1fr}.slide{width:62vw;max-width:260px}.single .slide{width:78vw;max-width:340px}}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+:root{--ok:#12805C;--okbg:#DDF3EA;--no:#B42318;--nobg:#FDE7E4;--wait:#8A5A00;--waitbg:#FFF1CC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#5FD3A6;--okbg:#0F3326;--no:#FF8E85;--nobg:#3B1512;--wait:#FFCB57;--waitbg:#3A2C08}}
+:root[data-theme="dark"]{--ok:#5FD3A6;--okbg:#0F3326;--no:#FF8E85;--nobg:#3B1512;--wait:#FFCB57;--waitbg:#3A2C08}
+.rv{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:10px}
+.rv .row{display:flex;gap:8px;flex-wrap:wrap}
+.btn.ok{background:var(--ok);color:var(--surface);border-color:var(--ok)}
+.btn.no{background:var(--surface);color:var(--no);border-color:var(--no)}
+.rv textarea{font:15px var(--body);width:100%;min-height:84px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);padding:10px;resize:vertical}
+.rv .err{color:var(--no);font-size:13px;min-height:1em}
+.pill{display:inline-flex;align-items:center;gap:6px;font:600 12.5px var(--body);border-radius:999px;padding:4px 10px;white-space:nowrap}
+.pill.ok{background:var(--okbg);color:var(--ok)}.pill.no{background:var(--nobg);color:var(--no)}.pill.wait{background:var(--waitbg);color:var(--wait)}
+.motivo{font-size:14px;background:var(--nobg);color:var(--fg);border-radius:10px;padding:10px 12px;overflow-wrap:anywhere;white-space:pre-wrap}
+#admin{background:var(--surface);border:2px solid var(--fg);border-radius:18px;padding:20px;margin-block:22px;display:flex;flex-direction:column;gap:16px}
+#admin h3{font-family:var(--display);font-size:20px;margin:0;letter-spacing:-.02em}
+#admin .tag{font:600 11px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sum{display:flex;gap:10px;flex-wrap:wrap}
+.sum .stat{min-width:120px}
+.sum .stat.ok b{color:var(--ok)}.sum .stat.no b{color:var(--no)}.sum .stat.wait b{color:var(--wait)}
+.tw{overflow-x:auto}
+table.adm{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+table.adm th{text-align:left;font:600 12px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line)}
+table.adm td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+table.adm td a{color:var(--fg);font-weight:600}
+.af{display:flex;gap:8px;flex-wrap:wrap}
+.af button{font:600 13px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:7px 13px;border-radius:999px;cursor:pointer}
+.af button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.revbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}.revbar input{font:15px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:10px;padding:9px 12px;min-width:220px}.note{font-size:13px;color:var(--muted);margin:0}
 </style>
 
-</head>
-<body>
 <div class="wrap">
   <header class="top">
     <div>
@@ -88,6 +109,8 @@ h2{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:-.02
     <div class="stats" id="stats"></div>
   </header>
 
+  <div class="revbar"><label for="who" class="caplabel">Seu nome (revisor)</label><input id="who" type="text" maxlength="60" placeholder="Digite seu nome"><span id="admbar"></span></div>
+  <section id="admin" hidden aria-label="Painel do administrador"></section>
   <nav class="filters" id="filters" aria-label="Filtrar por perfil">
     <button data-f="all" aria-pressed="true">Todos</button>
     <button data-f="solar" aria-pressed="false"><span class="dot d-solar"></span>Solar Para Todos</button>
@@ -104,7 +127,7 @@ h2{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:-.02
   <img id="lbimg" alt="">
   <button class="nx" id="lbn" aria-label="Próxima">›</button>
   <div class="cnt" id="lbc"></div>
-  <a id="lbd" class="dl" download>Baixar imagem</a>
+  
 </div>
 
 <script>
@@ -121,7 +144,7 @@ document.getElementById('stats').innerHTML = [
 ].map(([n,l])=>`<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('');
 
 list.innerHTML = POSTS.map((p,i)=>`
-  <article class="post" id="post-${p.num}" data-profile="${p.profile}" data-comment-target>
+  <article class="post" id="post-${p.num}" data-profile="${p.profile}" >
     <div style="min-width:0">
       <div class="meta">
         <span class="num">#${p.num}</span>
@@ -139,9 +162,10 @@ list.innerHTML = POSTS.map((p,i)=>`
       <div class="cap" id="cap-${i}">${esc(p.caption)}</div>
       <div class="actions">
         <button class="btn primary" data-copy="${i}">Copiar legenda</button>
-        <a class="btn" href="${p.imgs[0]}" download>Baixar capa</a>
+        
       </div>
       <div class="status" id="st-${i}" aria-live="polite"></div>
+      <div class="rv" id="rv-${i}"></div>
     </div>
   </article>`).join('');
 
@@ -172,7 +196,7 @@ list.addEventListener('click', async e=>{
 // visualização em tamanho real
 const lb=document.getElementById('lb'), lbimg=document.getElementById('lbimg'), lbc=document.getElementById('lbc');
 let cur={p:0,k:0};
-function show(){ const p=POSTS[cur.p]; lbimg.src=p.imgs[cur.k]; lbimg.alt=p.title+', slide '+(cur.k+1); document.getElementById('lbd').href=p.imgs[cur.k]; lbc.textContent=`#${p.num} · ${p.title} · ${cur.k+1}/${p.imgs.length}`; document.getElementById('lbp').hidden=document.getElementById('lbn').hidden=p.imgs.length<2; }
+function show(){ const p=POSTS[cur.p]; lbimg.src=p.imgs[cur.k]; lbimg.alt=p.title+', slide '+(cur.k+1); lbc.textContent=`#${p.num} · ${p.title} · ${cur.k+1}/${p.imgs.length}`; document.getElementById('lbp').hidden=document.getElementById('lbn').hidden=p.imgs.length<2; }
 function openLb(p,k){ cur={p,k}; show(); lb.hidden=false; document.getElementById('lbx').focus(); }
 function closeLb(){ lb.hidden=true; }
 function step(d){ const n=POSTS[cur.p].imgs.length; cur.k=(cur.k+d+n)%n; show(); }
@@ -181,7 +205,90 @@ document.getElementById('lbp').onclick=()=>step(-1);
 document.getElementById('lbn').onclick=()=>step(1);
 lb.addEventListener('click',e=>{ if(e.target===lb) closeLb(); });
 document.addEventListener('keydown',e=>{ if(lb.hidden) return; if(e.key==='Escape') closeLb(); if(e.key==='ArrowRight') step(1); if(e.key==='ArrowLeft') step(-1); });
+
+// ===== aprovação (Firebase opcional; sem configuração, salva só neste navegador) =====
+const ADMIN_EMAIL = "gabrielhebrique14@gmail.com";
+const FIREBASE_CONFIG = null; // cole aqui o objeto firebaseConfig do seu projeto (veja LEIA-ME)
+const REV = {}, MINE = {};
+let store=null, isAdmin=false, adminFilter='all', who=''; 
+try{ MINE_LS=JSON.parse(localStorage.getItem('mine')||'{}'); Object.assign(MINE,MINE_LS); who=localStorage.getItem('who')||''; }catch(e){}
+var MINE_LS;
+const fmt = t => { try{ return new Date(t).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}); }catch(e){ return ''; } };
+const pill = st => st==='approved' ? '<span class="pill ok">Aprovado</span>' : st==='rejected' ? '<span class="pill no">Reprovado</span>' : '<span class="pill wait">Aguardando</span>';
+function renderRv(i){
+  const p=POSTS[i], box=document.getElementById('rv-'+i), m=MINE[p.num];
+  const keep = box.querySelector('textarea') ? box.querySelector('textarea').value : '';
+  const editing = box.dataset.edit==='1';
+  let h = `<div class="row">${pill(m&&m.status)}${m?`<span class="note">${fmt(m.at)}</span>`:''}</div>`;
+  if(m && m.status==='rejected' && !editing) h += `<div class="motivo">${esc(m.comment||'')}</div>`;
+  if(editing){
+    h += `<label class="caplabel" for="tx-${i}">Motivo da reprovação</label><textarea id="tx-${i}" placeholder="Explique o que precisa mudar neste post">${esc(keep)}</textarea><div class="err" id="er-${i}" aria-live="polite"></div>
+    <div class="row"><button class="btn no" data-send="${i}">Enviar reprovação</button><button class="btn" data-cancel="${i}">Cancelar</button></div>`;
+  } else {
+    h += `<div class="row"><button class="btn ok" data-ok="${i}">${m&&m.status==='approved'?'Aprovado':'Aprovar'}</button><button class="btn no" data-no="${i}">${m&&m.status==='rejected'?'Editar motivo':'Reprovar'}</button></div>`;
+  }
+  box.innerHTML=h;
+}
+async function save(i,status,comment){
+  const p=POSTS[i], st=document.getElementById('st-'+i);
+  const rec={num:p.num,title:p.title,profile:p.profile,status,comment:comment||'',by:who||'Revisor',at:new Date().toISOString()};
+  try{
+    if(store) await store.save(rec);
+    MINE[p.num]=rec; REV[p.num]=rec;
+    try{ localStorage.setItem('mine',JSON.stringify(MINE)); }catch(e){}
+    document.getElementById('rv-'+i).dataset.edit='0'; renderRv(i); renderAdmin();
+    st.textContent = status==='approved'?'Post aprovado.':'Reprovação enviada.';
+  }catch(e){ st.textContent='Não foi possível salvar. Verifique a conexão e a configuração do Firebase.'; }
+}
+list.addEventListener('click',e=>{
+  const g=k=>{const b=e.target.closest('['+k+']'); return b?+b.getAttribute(k):null;};
+  let i;
+  if((i=g('data-ok'))!==null){ save(i,'approved',''); }
+  else if((i=g('data-no'))!==null){ const b=document.getElementById('rv-'+i); b.dataset.edit='1'; renderRv(i); const t=document.getElementById('tx-'+i); t.value=(MINE[POSTS[i].num]||{}).comment||''; t.focus(); }
+  else if((i=g('data-cancel'))!==null){ document.getElementById('rv-'+i).dataset.edit='0'; renderRv(i); }
+  else if((i=g('data-send'))!==null){ const v=document.getElementById('tx-'+i).value.trim(); if(v.length<3){ document.getElementById('er-'+i).textContent='Escreva o motivo para reprovar.'; return; } save(i,'rejected',v); }
+});
+function renderAdmin(){
+  const el=document.getElementById('admin'); if(!isAdmin){ el.hidden=true; return; }
+  el.hidden=false;
+  const st=n=>REV[n]?REV[n].status:'wait';
+  const c={approved:0,rejected:0,wait:0}; POSTS.forEach(p=>c[st(p.num)]++);
+  const rows=POSTS.filter(p=>adminFilter==='all'||st(p.num)===adminFilter);
+  const F=[['all','Todos'],['approved','Aprovados'],['rejected','Reprovados'],['wait','Aguardando']];
+  el.innerHTML=`<div><span class="tag">Somente administrador</span><h3>Painel de aprovação</h3></div>
+  <div class="sum"><div class="stat ok"><b>${c.approved}</b><span>Aptos a postar</span></div><div class="stat no"><b>${c.rejected}</b><span>Reprovados</span></div><div class="stat wait"><b>${c.wait}</b><span>Aguardando</span></div></div>
+  <div class="af" role="group" aria-label="Filtrar painel">${F.map(([k,l])=>`<button data-af="${k}" aria-pressed="${k===adminFilter}">${l}</button>`).join('')}</div>
+  <div class="tw"><table class="adm"><thead><tr><th>Post</th><th>Perfil</th><th>Situação</th><th>Motivo</th><th>Por</th><th>Data</th></tr></thead><tbody>
+  ${rows.map(p=>{const r=REV[p.num];return `<tr><td><a href="#post-${p.num}">#${p.num}</a> ${esc(p.title)}</td><td>${PROF[p.profile]}</td><td>${pill(r&&r.status)}</td><td>${r&&r.status==='rejected'?esc(r.comment):''}</td><td>${r?esc(r.by||''):''}</td><td>${r?fmt(r.at):''}</td></tr>`;}).join('')||'<tr><td colspan="6">Nenhum post nesta situação.</td></tr>'}
+  </tbody></table></div>`;
+}
+document.getElementById('admin').addEventListener('click',e=>{ const b=e.target.closest('[data-af]'); if(b){ adminFilter=b.dataset.af; renderAdmin(); } });
+const nm=document.getElementById('who'); nm.value=who; nm.addEventListener('input',()=>{ who=nm.value.trim(); try{localStorage.setItem('who',who);}catch(e){} });
+POSTS.forEach((_,i)=>renderRv(i));
+
+// ===== modo administrador =====
+const adm=document.getElementById('admbar');
+if(!FIREBASE_CONFIG){
+  // sem banco: o painel usa os dados deste navegador (teste). Para valer para todos, configure o Firebase.
+  if(location.hash==='#admin' || new URLSearchParams(location.search).has('admin')){ isAdmin=true; Object.assign(REV,MINE); renderAdmin(); }
+  adm.innerHTML='<span class="note">Modo de teste: as aprovações ficam só neste navegador. Configure o Firebase para reunir tudo no painel.</span>';
+}else{
+  (async()=>{
+    const V='10.14.1', B='https://www.gstatic.com/firebasejs/'+V+'/';
+    const [{initializeApp},A,F]=await Promise.all([import(B+'firebase-app.js'),import(B+'firebase-auth.js'),import(B+'firebase-firestore.js')]);
+    const app=initializeApp(FIREBASE_CONFIG), auth=A.getAuth(app), fs=F.getFirestore(app);
+    store={ save: rec=>F.setDoc(F.doc(fs,'reviews',rec.num),rec) };
+    let watching=false;
+    function watch(){ if(watching) return; watching=true; F.onSnapshot(F.collection(fs,'reviews'),s=>{ s.forEach(d=>{ REV[d.id]=d.data(); }); renderAdmin(); },()=>{}); }
+    A.onAuthStateChanged(auth,u=>{
+      if(!u){ A.signInAnonymously(auth).catch(()=>{}); return; }
+      if(!u.isAnonymous && u.email===ADMIN_EMAIL){ isAdmin=true; watch(); renderAdmin(); adm.innerHTML='<button class="btn" id="out">Sair do modo administrador</button>'; document.getElementById('out').onclick=()=>A.signOut(auth); }
+      else if(!u.isAnonymous){ A.signOut(auth); }
+      else { adm.innerHTML='<button class="btn" id="in">Entrar como administrador</button>'; document.getElementById('in').onclick=()=>A.signInWithPopup(auth,new A.GoogleAuthProvider()).catch(()=>{}); }
+    });
+  })().catch(()=>{ adm.innerHTML='<span class="note">Não foi possível conectar ao banco de dados.</span>'; });
+}
 </script>
 
-</body>
-</html>
+
+</body></html>
