@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="07v_logo.png">
+<title>Posts Solar Para Todos e 07 Volts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Outfit:wght@400;500;600&display=swap">
+<style>
+/* Layout: cabeçalho com filtros por perfil; cada post é uma faixa com os slides lado a lado e a legenda ao lado */
+:root{
+  --bg:#F3F5F9; --surface:#FFFFFF; --fg:#13203F; --muted:#5A6680; --line:#DDE3EE;
+  --solar:#E9A800; --solar-ink:#055171; --volts:#2858D6; --volts-yel:#FFE40C; --collab:#0B7A93;
+  --chip:#EEF2FA;
+  --display:'Sora',system-ui,sans-serif; --body:'Outfit',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1322; --surface:#151D31; --fg:#E9EEF8; --muted:#9BA7C0; --line:#26314B;
+  --solar:#FDB913; --solar-ink:#7FD3E8; --volts:#7EA2FF; --collab:#4FC3D9; --chip:#1D2740; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1322; --surface:#151D31; --fg:#E9EEF8; --muted:#9BA7C0; --line:#26314B;
+  --solar:#FDB913; --solar-ink:#7FD3E8; --volts:#7EA2FF; --collab:#4FC3D9; --chip:#1D2740; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.brandrow{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.brandrow .lg{background:#fff;border-radius:12px;padding:6px 10px;display:flex;align-items:center;border:1px solid var(--line)}
+.brandrow img{height:30px;display:block}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(26px,4vw,38px);letter-spacing:-.03em;line-height:1.05;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:8px 0 0;max-width:62ch}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;min-width:96px}
+.stat b{display:block;font-family:var(--display);font-size:22px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+nav.filters{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:8px;flex-wrap:wrap;padding-block:14px}
+nav.filters button{font:600 14px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:9px 16px;border-radius:999px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+nav.filters button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+nav.filters button:focus-visible,.btn:focus-visible,.slide:focus-visible{outline:3px solid var(--volts);outline-offset:2px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.d-solar{background:var(--solar)}.d-v07{background:var(--volts)}.d-collab{background:var(--collab)}
+.hint{font-size:13px;color:var(--muted);margin:0 0 18px}
+.list{display:flex;flex-direction:column;gap:22px}
+.post{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:22px;scroll-margin-top:70px}
+.post[data-profile="solar"]{border-top:5px solid var(--solar)}
+.post[data-profile="v07"]{border-top:5px solid var(--volts)}
+.post[data-profile="collab"]{border-top:5px solid var(--collab)}
+.meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.num{font-family:var(--display);font-weight:800;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip{font-size:12.5px;font-weight:600;background:var(--chip);border-radius:999px;padding:4px 10px;white-space:nowrap}
+.chip.st-novo{background:#FDB913;color:#0E1F4D}.chip.st-refeito{background:#2858D6;color:#fff}.chip.p-solar{color:var(--solar-ink)}.chip.p-v07{color:var(--volts)}.chip.p-collab{color:var(--collab)}
+h2{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:-.02em;line-height:1.2;margin:0 0 14px;text-wrap:balance}
+.strip{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px}
+.slide{flex:0 0 auto;width:216px;aspect-ratio:4/5;max-width:100%;border-radius:10px;overflow:hidden;border:1px solid var(--line);scroll-snap-align:start;position:relative;cursor:zoom-in;background:var(--chip);padding:0}
+.slide img{width:100%;height:100%;object-fit:cover;display:block}
+.slide .n{position:absolute;left:6px;top:6px;background:rgba(0,0,0,.6);color:#fff;font:600 11px var(--body);padding:2px 7px;border-radius:6px}
+.single .slide{width:320px}
+.side{display:flex;flex-direction:column;gap:10px;min-width:0}
+.cap{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:14.5px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:360px;overflow-y:auto}
+.caplabel{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{text-decoration:none;display:inline-flex;align-items:center;font:600 14px var(--body);border-radius:10px;padding:10px 14px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+.btn.primary{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn[disabled]{opacity:.5;cursor:default}
+.status{font-size:13px;color:var(--muted);min-height:1.2em}
+.lb{position:fixed;inset:0;background:rgba(5,10,20,.92);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px}
+.lb img{max-height:88vh;max-width:min(92vw,700px);border-radius:12px}
+.lb .x,.lb .pv,.lb .nx{position:absolute;background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:999px;width:48px;height:48px;font-size:22px;cursor:pointer}
+.lb .x{top:calc(16px + env(safe-area-inset-top,0px));right:16px}.lb .pv{left:16px;top:50%}.lb .nx{right:16px;top:50%}
+.lb .dl{position:absolute;top:calc(22px + env(safe-area-inset-top,0px));left:16px;background:#fff;color:#13203F;font:600 14px var(--body);padding:10px 16px;border-radius:999px;text-decoration:none}
+.lb .cnt{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom,0px));color:#fff;font:600 14px var(--body)}
+@media (max-width:860px){.post{grid-template-columns:1fr}.slide{width:62vw;max-width:260px}.single .slide{width:78vw;max-width:340px}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="brandrow"><span class="lg"><img src="solar_logo.png" alt="Solar Para Todos"></span><span class="lg"><img src="07v_logo.png" alt="07 Volts"></span></div>
+      <h1>Posts Solar Para Todos e 07 Volts</h1>
+      <p class="sub">Artes e legendas dos perfis Solar Para Todos e 07 Volts, sem datas fixas. Clique numa arte para ver em tamanho real e use “Copiar legenda” na hora de postar.</p>
+    </div>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <nav class="filters" id="filters" aria-label="Filtrar por perfil">
+    <button data-f="all" aria-pressed="true">Todos</button>
+    <button data-f="solar" aria-pressed="false"><span class="dot d-solar"></span>Solar Para Todos</button>
+    <button data-f="v07" aria-pressed="false"><span class="dot d-v07"></span>07 Volts</button>
+    <button data-f="collab" aria-pressed="false"><span class="dot d-collab"></span>Collab</button>
+  </nav>
+  <p class="hint">Arraste para o lado para ver todos os slides de cada carrossel. Artes em 1080 × 1350 (4:5).</p>
+  <main class="list" id="list"></main>
+</div>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Arte em tamanho real">
+  <button class="x" id="lbx" aria-label="Fechar">×</button>
+  <button class="pv" id="lbp" aria-label="Anterior">‹</button>
+  <img id="lbimg" alt="">
+  <button class="nx" id="lbn" aria-label="Próxima">›</button>
+  <div class="cnt" id="lbc"></div>
+  <a id="lbd" class="dl" download>Baixar imagem</a>
+</div>
+
+<script>
+const POSTS = [{"num": "01", "fmt": "Carrossel", "title": "Economize sem instalar placas", "profile": "solar", "imgs": ["img/01-slide-01.jpg", "img/01-slide-02.jpg", "img/01-slide-03.jpg", "img/01-slide-04.jpg", "img/01-slide-05.jpg", "img/01-slide-06.jpg", "img/01-slide-07.jpg", "img/01-slide-08.jpg"], "caption": "Sua conta de luz mais barata, sem instalar nenhuma placa no telhado. ☀️\n\nFunciona assim:\n1️⃣ Uma usina solar parceira gera energia limpa.\n2️⃣ A energia entra na rede da EDP.\n3️⃣ Ela volta pra você como crédito na conta de luz, com desconto de até 15% sobre a parcela compensada.\n\nSem obras. Sem comprar equipamentos. 100% digital.\n\n📩 Envie sua conta e descubra quanto você economiza.\n💾 Salve e envie para quem paga a conta aí na sua casa.\n\n#SolarParaTodos #EnergiaSolar #EnergiaPorAssinatura #ContaDeLuz #EspiritoSanto #EDP"}, {"num": "02", "fmt": "Carrossel", "title": "Sua vaga pode trabalhar por você", "profile": "v07", "imgs": ["img/02-slide-01.jpg", "img/02-slide-02.jpg", "img/02-slide-03.jpg", "img/02-slide-04.jpg", "img/02-slide-05.jpg", "img/02-slide-06.jpg", "img/02-slide-07.jpg", "img/02-slide-08.jpg"], "caption": "Sua vaga pode trabalhar por você.\n\n1 em cada 5 carros novos vendidos no Brasil já é eletrificado. E quem dirige elétrico escolhe onde parar pelo mapa de recarga.\n\nCom um eletroposto 07 Volts, o seu estacionamento entra nesse mapa. Recarga rápida, app próprio e manutenção por nossa conta.\n\nSeu espaço tem potencial? Fale com a 07 Volts.\n\n#07Volts #Eletroposto #MobilidadeEletrica #CarroEletrico #EspiritoSanto"}, {"num": "03", "fmt": "Carrossel", "title": "5 mitos da energia por assinatura", "profile": "solar", "imgs": ["img/03-slide-01.jpg", "img/03-slide-02.jpg", "img/03-slide-03.jpg", "img/03-slide-04.jpg", "img/03-slide-05.jpg", "img/03-slide-06.jpg", "img/03-slide-07.jpg", "img/03-slide-08.jpg"], "caption": "5 mitos que fazem você pagar mais caro na conta de luz 👇\n\n❌ \"Preciso instalar placas\" → a energia vem de usinas parceiras.\n❌ \"Preciso investir alto\" → você não compra equipamentos.\n❌ \"Só pra casa própria\" → aluguel e apartamento também podem.\n❌ \"Em dia nublado fico sem luz\" → você continua conectado à rede da EDP.\n❌ \"É burocrático\" → o processo é 100% digital.\n\n💬 Qual desses você acreditava? Conta aqui!\n📩 Envie sua conta e descubra quanto você economiza.\n\n#SolarParaTodos #EnergiaSolar #EnergiaPorAssinatura #MitosEVerdades #ContaDeLuz #EspiritoSanto"}, {"num": "04", "fmt": "Carrossel", "title": "O novo posto não vende gasolina", "profile": "v07", "imgs": ["img/04-slide-01.jpg", "img/04-slide-02.jpg", "img/04-slide-03.jpg", "img/04-slide-04.jpg", "img/04-slide-05.jpg", "img/04-slide-06.jpg", "img/04-slide-07.jpg", "img/04-slide-08.jpg"], "caption": "O novo posto não vende gasolina. ⚡\n\nPor mais de um século, abastecer foi um ritual de cinco minutos: parar, abastecer, pagar e partir. Com o veículo elétrico, essa lógica se inverte. A recarga acontece onde o motorista já está: no trabalho, no mercado, no shopping, no restaurante, no hotel.\n\nÉ aqui que nasce uma nova oportunidade. O tempo de recarga se transforma em tempo de permanência, e cada minuto com o carro conectado passa a gerar movimento e faturamento para o seu negócio.\n\nE para quem já tem posto de combustível, a mensagem é clara: o eletroposto soma, não substitui. Ele abre as portas para um público que cresce a cada mês.\n\nNa 07 Volts, unimos engenharia e tecnologia para levar essa infraestrutura até o seu estacionamento, do projeto à operação, com recarga rápida de 60 kW DC. E isso já é realidade no Espírito Santo.\n\n👉 Seu negócio pode receber um eletroposto? Fale com a 07 Volts e descubra o potencial do seu espaço.\n\n#07Volts #Eletroposto #MobilidadeEletrica #EngenhariaEletrica #CarroEletrico #PostoDeCombustivel #EspiritoSanto"}, {"num": "06", "fmt": "Carrossel", "title": "Conheça o eletroposto 07 Volts", "profile": "v07", "imgs": ["img/06-slide-01.jpg", "img/06-slide-02.jpg", "img/06-slide-03.jpg", "img/06-slide-04.jpg", "img/06-slide-05.jpg"], "caption": "Conheça o eletroposto 07 Volts.\n\n60 kW em corrente contínua, app próprio e gestão integrada. Em operação no Espírito Santo.\n\nE o carregador é só o começo: projeto, instalação e manutenção ficam com a nossa engenharia.\n\nQuer um eletroposto no seu estacionamento? Fale com a 07 Volts.\n\n#07Volts #Eletroposto #CarregadorEletrico #MobilidadeEletrica #EspiritoSanto"}, {"num": "07", "fmt": "Post", "title": "De onde vem sua energia", "profile": "solar", "imgs": ["img/07-slide-01.jpg"], "caption": "De onde vem a sua energia? Daqui.\n\nUma usina solar parceira gera. A rede da EDP distribui. Você recebe o crédito na conta e paga menos.\n\nNenhuma placa no seu telhado. Só economia.\n\nEnvie sua conta e descubra quanto pode economizar.\n\n#SolarParaTodos #EnergiaSolar #UsinaSolar #EnergiaPorAssinatura #EspiritoSanto"}, {"num": "08", "fmt": "Carrossel", "title": "Seu cliente carrega enquanto consome", "profile": "v07", "imgs": ["img/08-slide-01.jpg", "img/08-slide-02.jpg", "img/08-slide-03.jpg", "img/08-slide-04.jpg", "img/08-slide-05.jpg", "img/08-slide-06.jpg", "img/08-slide-07.jpg"], "caption": "Seu cliente carrega enquanto consome.\n\nUma recarga rápida leva, em média, 40 minutos. O tempo de um almoço, das compras da semana, de uma passada na farmácia.\n\nEnquanto o carro carrega, o cliente fica. E quem fica, consome.\n\nLeve um eletroposto 07 Volts para o seu estacionamento.\n\n#07Volts #Eletroposto #MobilidadeEletrica #Varejo #EspiritoSanto"}, {"num": "09", "fmt": "Carrossel", "title": "Seu negócio está pronto para um eletroposto?", "profile": "v07", "imgs": ["img/09-slide-01.jpg", "img/09-slide-02.jpg", "img/09-slide-03.jpg", "img/09-slide-04.jpg", "img/09-slide-05.jpg", "img/09-slide-06.jpg", "img/09-slide-07.jpg"], "caption": "Seu negócio está pronto para um eletroposto? Faça o teste.\n\nTem vagas livres.\nRecebe gente todo dia.\nTem estrutura elétrica.\nQuer um parceiro do início ao fim.\n\nMarcou 3 ou mais? Seu espaço tem potencial. A avaliação da 07 Volts é sem compromisso.\n\n#07Volts #Eletroposto #CarregadorEletrico #MobilidadeEletrica #EspiritoSanto"}, {"num": "10", "fmt": "Post", "title": "Energia solar sem placa? Sim.", "profile": "solar", "imgs": ["img/10-slide-01.jpg"], "caption": "Energia solar sem placa no telhado? Sim.\n\nA usina parceira gera, o crédito chega na sua conta da EDP e você paga menos. Sem obra e sem comprar equipamento.\n\nEnvie sua conta e descubra quanto pode economizar.\n\n#SolarParaTodos #EnergiaSolar #SemPlacas #ContaDeLuz #EspiritoSanto"}, {"num": "11", "fmt": "Carrossel", "title": "Energia limpa em 4 passos", "profile": "solar", "imgs": ["img/11-slide-01.jpg", "img/11-slide-02.jpg", "img/11-slide-03.jpg", "img/11-slide-04.jpg", "img/11-slide-05.jpg", "img/11-slide-06.jpg", "img/11-slide-07.jpg"], "caption": "Energia limpa em 4 passos.\n\n1. Envie sua conta de luz.\n2. Receba a simulação e assine online.\n3. A usina parceira gera e você recebe os créditos na conta.\n4. Tem carro elétrico? Recarregue nos eletropostos da @07volts.\n\nDa conta de luz à tomada do carro, energia limpa em cada etapa.\n\nEnvie sua conta e descubra quanto pode economizar.\n\n#SolarParaTodos #07Volts #EnergiaSolar #EnergiaLimpa #EspiritoSanto"}, {"num": "12", "fmt": "Post", "title": "Do sol à tomada", "profile": "collab", "imgs": ["img/12-slide-01.jpg"], "caption": "Do sol à tomada.\n\nO sol reduz a conta de luz. E a mesma energia pode mover o seu carro.\n\nEconomia na conta: @solarparatodos\nEletroposto no seu negócio: @07volts\n\nDuas empresas capixabas, uma energia só.\n\n#DoSolATomada #SolarParaTodos #07Volts #EnergiaSolar #MobilidadeEletrica\n\n[Publicar em formato Collab nos dois perfis.]"}, {"num": "13", "fmt": "Carrossel", "title": "Energia solar no seu telhado", "profile": "collab", "imgs": ["img/13-slide-01.jpg", "img/13-slide-02.jpg", "img/13-slide-03.jpg", "img/13-slide-04.jpg", "img/13-slide-05.jpg", "img/13-slide-06.jpg", "img/13-slide-07.jpg", "img/13-slide-08.jpg", "img/13-slide-09.jpg"], "caption": "Seu telhado pode gerar energia.\n\nNegócio, prédio, fazenda ou casa: onde bate sol, tem economia.\n\nA 07 Volts cuida da engenharia. Projeto, homologação e instalação.\nA Solar Para Todos cuida da gestão. Geração e créditos acompanhados de perto.\n\nUm só projeto, do telhado à conta de luz.\n\nPeça seu estudo de viabilidade. Chame a @07volts ou a @solarparatodos.\n\n#EnergiaSolar #07Volts #SolarParaTodos #PlacasSolares #EspiritoSanto\n\n[Publicar em formato Collab nos dois perfis.]"}, {"num": "14", "fmt": "Carrossel", "title": "BESS: a energia do sol guardada pra depois", "profile": "v07", "imgs": ["img/14-slide-01.jpg", "img/14-slide-02.jpg", "img/14-slide-03.jpg", "img/14-slide-04.jpg", "img/14-slide-05.jpg", "img/14-slide-06.jpg", "img/14-slide-07.jpg"], "caption": "A energia do sol, guardada pra depois.\n\nBESS é um sistema de baterias que armazena energia quando ela sobra ou está mais barata e entrega quando a demanda sobe.\n\nNa prática: menos custo no horário de pico, backup se a rede cair e mais potência para eletropostos.\n\nA engenharia da 07 Volts projeta o BESS ideal para o seu consumo.\n\n#07Volts #BESS #ArmazenamentoDeEnergia #EnergiaSolar #Engenharia"}, {"num": "15", "fmt": "Carrossel", "title": "Energia solar no Brasil em números", "profile": "solar", "imgs": ["img/15-slide-01.jpg", "img/15-slide-02.jpg", "img/15-slide-03.jpg", "img/15-slide-04.jpg", "img/15-slide-05.jpg", "img/15-slide-06.jpg"], "caption": "77,6 GW. O sol já é gigante no Brasil.\n\nA meta de 2026 foi batida em setembro, com mais de três meses de folga. E quase dois terços dessa energia vêm da geração distribuída: telhados, empresas e usinas compartilhadas.\n\nÉ nesse modelo que a Solar Para Todos leva o desconto até a sua conta. Sem placa, sem obra.\n\nFaça parte desse número. Envie sua conta e descubra quanto pode economizar.\n\nFonte: ABSOLAR, via Canal Solar, setembro de 2026.\n\n#SolarParaTodos #EnergiaSolar #GeracaoDistribuida #EspiritoSanto #EnergiaLimpa"}, {"num": "16", "fmt": "Carrossel", "title": "Bandeira verde em outubro", "profile": "solar", "imgs": ["img/16-slide-01.jpg", "img/16-slide-02.jpg", "img/16-slide-03.jpg", "img/16-slide-04.jpg", "img/16-slide-05.jpg", "img/16-slide-06.jpg"], "caption": "Outubro chegou de bandeira verde.\n\nDepois de cinco meses de amarela, a conta de luz fica sem cobrança extra. O alívio é real, mas dura pouco: a bandeira muda todo mês e o reajuste anual continua.\n\nCom a Solar Para Todos, o desconto vem todo mês, com qualquer bandeira.\n\nEnvie sua conta e descubra quanto pode economizar.\n\nFonte: ANEEL, setembro de 2026.\n\n#SolarParaTodos #ContaDeLuz #BandeiraTarifaria #EnergiaSolar #EspiritoSanto"}, {"num": "17", "fmt": "Carrossel", "title": "O Fio B chegou a 60%", "profile": "collab", "imgs": ["img/17-slide-01.jpg", "img/17-slide-02.jpg", "img/17-slide-03.jpg", "img/17-slide-04.jpg", "img/17-slide-05.jpg", "img/17-slide-06.jpg"], "caption": "O Fio B chegou a 60%.\n\nQuem instalou placas depois de janeiro de 2023 paga uma parte do custo da rede sobre a energia que injeta. Em 2026 são 60%. Em 2028, 90%.\n\nA virada do mercado: consumir mais do que injetar. Sistemas híbridos, com baterias, guardam a energia do dia para usar à noite e no pico.\n\nA 07 Volts faz a engenharia. A Solar Para Todos cuida da gestão.\n\nInstalar ainda vale a pena? Faça as contas com a gente. Chame a @07volts ou a @solarparatodos.\n\nFonte: Lei 14.300 e ABSOLAR, via pv magazine Brasil.\n\n#EnergiaSolar #FioB #Lei14300 #BESS #07Volts #SolarParaTodos\n\n[Publicar em formato Collab nos dois perfis.]"}, {"num": "18", "fmt": "Carrossel", "title": "1 milhão de carros eletrificados", "profile": "v07", "imgs": ["img/18-slide-01.jpg", "img/18-slide-02.jpg", "img/18-slide-03.jpg", "img/18-slide-04.jpg", "img/18-slide-05.jpg", "img/18-slide-06.jpg"], "caption": "1 milhão de carros eletrificados já rodam no Brasil.\n\nQuase 35% deles vieram só em 2026. E 8 em cada 10 vendidos este ano precisam de tomada.\n\nA pergunta agora é: onde carregar?\n\nColoque o seu negócio no caminho desses motoristas. Leve um eletroposto 07 Volts para o seu estacionamento.\n\nFonte: ABVE, setembro de 2026.\n\n#07Volts #Eletroposto #CarroEletrico #MobilidadeEletrica #EspiritoSanto"}, {"num": "19", "fmt": "Carrossel", "title": "Mercado livre de energia: a energia vai virar escolha", "profile": "solar", "imgs": ["img/19-slide-01.jpg", "img/19-slide-02.jpg", "img/19-slide-03.jpg", "img/19-slide-04.jpg", "img/19-slide-05.jpg", "img/19-slide-06.jpg"], "caption": "A energia vai virar escolha.\n\nO mercado livre de energia abre para comércios e pequenas indústrias em novembro de 2027 e para residências em novembro de 2028. A rede continua com a distribuidora, mas a energia poderá vir de outros fornecedores.\n\nNão precisa esperar. Com a Solar Para Todos, você já escolhe energia de usina solar parceira hoje, com crédito na conta e sem obra.\n\nEnvie sua conta e descubra quanto pode economizar.\n\nFonte: governo federal, via Canal Solar. Decreto de agosto de 2026, sujeito à regulação da ANEEL.\n\n#SolarParaTodos #MercadoLivreDeEnergia #EnergiaSolar #ContaDeLuz #EspiritoSanto"}];
+const PROF = {solar:"Solar Para Todos", v07:"07 Volts", collab:"Collab 07 Volts + Solar"};
+const list = document.getElementById('list');
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+document.getElementById('stats').innerHTML = [
+  [POSTS.length,'posts'],
+  [POSTS.filter(p=>p.profile==='solar').length,'Solar'],
+  [POSTS.filter(p=>p.profile==='v07').length,'07 Volts'],
+  [POSTS.reduce((a,p)=>a+p.imgs.length,0),'artes']
+].map(([n,l])=>`<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('');
+
+list.innerHTML = POSTS.map((p,i)=>`
+  <article class="post" id="post-${p.num}" data-profile="${p.profile}" data-comment-target>
+    <div style="min-width:0">
+      <div class="meta">
+        <span class="num">#${p.num}</span>
+        <span class="chip p-${p.profile}">${PROF[p.profile]}</span>
+        
+        <span class="chip">${p.fmt}${p.imgs.length>1?' · '+p.imgs.length+' slides':''}</span>
+      </div>
+      <h2>${esc(p.title)}</h2>
+      <div class="strip ${p.imgs.length===1?'single':''}">
+        ${p.imgs.map((src,k)=>`<button class="slide" data-p="${i}" data-k="${k}" aria-label="Ver slide ${k+1} de ${p.imgs.length}"><img src="${src}" alt="${esc(p.title)}, slide ${k+1}" loading="${i<2?'eager':'lazy'}">${p.imgs.length>1?`<span class="n">${k+1}/${p.imgs.length}</span>`:''}</button>`).join('')}
+      </div>
+    </div>
+    <div class="side">
+      <span class="caplabel">Legenda</span>
+      <div class="cap" id="cap-${i}">${esc(p.caption)}</div>
+      <div class="actions">
+        <button class="btn primary" data-copy="${i}">Copiar legenda</button>
+        <a class="btn" href="${p.imgs[0]}" download>Baixar capa</a>
+      </div>
+      <div class="status" id="st-${i}" aria-live="polite"></div>
+    </div>
+  </article>`).join('');
+
+// filtros
+const fbtns = [...document.querySelectorAll('#filters button')];
+function applyFilter(f){
+  fbtns.forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.f===f)));
+  document.querySelectorAll('.post').forEach(el=>{ el.hidden = !(f==='all' || el.dataset.profile===f); });
+  try{ localStorage.setItem('filtro', f); }catch(e){}
+}
+fbtns.forEach(b=>b.addEventListener('click',()=>applyFilter(b.dataset.f)));
+try{ const s=localStorage.getItem('filtro'); if(s) applyFilter(s); }catch(e){}
+
+// copiar legenda
+list.addEventListener('click', async e=>{
+  const c = e.target.closest('[data-copy]');
+  if(c){
+    const i=+c.dataset.copy, st=document.getElementById('st-'+i);
+    try{ await navigator.clipboard.writeText(POSTS[i].caption); st.textContent='Legenda copiada.'; }
+    catch(err){ const r=document.createRange(); r.selectNodeContents(document.getElementById('cap-'+i)); const s=getSelection(); s.removeAllRanges(); s.addRange(r); st.textContent='Legenda selecionada. Use Ctrl+C para copiar.'; }
+    return;
+  }
+  const s = e.target.closest('.slide');
+  if(s) openLb(+s.dataset.p, +s.dataset.k);
+});
+
+
+// visualização em tamanho real
+const lb=document.getElementById('lb'), lbimg=document.getElementById('lbimg'), lbc=document.getElementById('lbc');
+let cur={p:0,k:0};
+function show(){ const p=POSTS[cur.p]; lbimg.src=p.imgs[cur.k]; lbimg.alt=p.title+', slide '+(cur.k+1); document.getElementById('lbd').href=p.imgs[cur.k]; lbc.textContent=`#${p.num} · ${p.title} · ${cur.k+1}/${p.imgs.length}`; document.getElementById('lbp').hidden=document.getElementById('lbn').hidden=p.imgs.length<2; }
+function openLb(p,k){ cur={p,k}; show(); lb.hidden=false; document.getElementById('lbx').focus(); }
+function closeLb(){ lb.hidden=true; }
+function step(d){ const n=POSTS[cur.p].imgs.length; cur.k=(cur.k+d+n)%n; show(); }
+document.getElementById('lbx').onclick=closeLb;
+document.getElementById('lbp').onclick=()=>step(-1);
+document.getElementById('lbn').onclick=()=>step(1);
+lb.addEventListener('click',e=>{ if(e.target===lb) closeLb(); });
+document.addEventListener('keydown',e=>{ if(lb.hidden) return; if(e.key==='Escape') closeLb(); if(e.key==='ArrowRight') step(1); if(e.key==='ArrowLeft') step(-1); });
+</script>
+
+</body>
+</html>
